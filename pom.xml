@@ -40,6 +40,42 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+
+        <!-- Spring Boot Web: 提供Web服务和控制器功能 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <!-- 作用: 与授权服务器相同，提供Web层支持 -->
+        </dependency>
+
+        <!-- Thymeleaf模板引擎: 渲染客户端页面 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+            <!-- 作用:
+                 1. 渲染首页(home.html)和用户信息页面(user.html)
+                 2. 显示OAuth2登录入口和用户数据
+            -->
+        </dependency>
+
+        <!-- WebFlux: 响应式HTTP客户端 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+            <!-- 作用:
+                 1. 提供WebClient，用于发送HTTP请求
+                 2. 调用授权服务器的/oauth/token端点（令牌交换）
+                 3. 调用授权服务器的/oauth/userinfo端点（获取用户信息）
+                 4. 支持同步阻塞调用(.block())，简化代码逻辑
+            -->
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
 
     <build>

@@ -26,14 +26,15 @@ public class OAuth2Service {
     private final WebClient webClient = WebClient.create();
 
 
-    public String getAccessToken(String code) {
+    public Map<String, Object> getAccessToken(String code, String codeVerifier) {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
         params.add("code", code);
+        params.add("code_verifier", codeVerifier);
         params.add("client_id", clientId);
         params.add("client_secret", clientSecret);
 
-        Map response = webClient.post()
+        Map<String, Object> response = webClient.post()
                 .uri(tokenUri)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .bodyValue(params)
@@ -41,11 +42,15 @@ public class OAuth2Service {
                 .bodyToMono(Map.class)
                 .block();
 
-        if (response.containsKey("error")) {
-            throw new RuntimeException("获取访问令牌失败: " + response.get("error"));
+        if (response == null) {
+            throw new RuntimeException("授权服务器未返回响应");
         }
 
-        return (String) response.get("access_token");
+        if (response.containsKey("error")) {
+            return response;
+        }
+
+        return response;
     }
 
     public Map<String, Object> getUserInfo(String accessToken) {

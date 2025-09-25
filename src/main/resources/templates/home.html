@@ -1,11 +1,49 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>OAuth2 客户端</title>
-    <meta charset="UTF-8">
-</head>
+<head><meta charset="UTF-8"><title>PKCE Demo</title></head>
 <body>
-<h1>OAuth2 客户端演示</h1>
-<p><a href="/login">点击这里使用OAuth2登录</a></p>
+<h1>OAuth2 PKCE Demo</h1>
+<button id="login-btn">Login with PKCE</button>
+<script>
+    const config = {
+        clientId: 'client123',
+        authorizeUri: 'http://localhost:8080/oauth/authorize',
+        redirectUri: 'http://localhost:8081/callback',
+        scope: 'read'
+    };
+
+    async function startPkce() {
+        const codeVerifier = generateVerifier();
+        sessionStorage.setItem('pkce_code_verifier', codeVerifier);
+        const codeChallenge = await generateChallenge(codeVerifier);
+        const authorizeUrl = new URL(config.authorizeUri);
+        authorizeUrl.searchParams.set('client_id', config.clientId);
+        authorizeUrl.searchParams.set('redirect_uri', config.redirectUri);
+        authorizeUrl.searchParams.set('response_type', 'code');
+        authorizeUrl.searchParams.set('scope', config.scope);
+        authorizeUrl.searchParams.set('state', crypto.randomUUID());
+        authorizeUrl.searchParams.set('code_challenge', codeChallenge);
+        authorizeUrl.searchParams.set('code_challenge_method', 'S256');
+        window.location = authorizeUrl.toString();
+    }
+
+    function generateVerifier(length = 64) {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+        const random = new Uint8Array(length);
+        crypto.getRandomValues(random);
+        return Array.from(random, b => chars[b % chars.length]).join('');
+    }
+
+    async function generateChallenge(verifier) {
+        const data = new TextEncoder().encode(verifier);
+        const digest = await crypto.subtle.digest('SHA-256', data);
+        const bytes = new Uint8Array(digest);
+        let str = '';
+        bytes.forEach(b => str += String.fromCharCode(b));
+        return btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    }
+
+    document.getElementById('login-btn').onclick = startPkce;
+</script>
 </body>
 </html>

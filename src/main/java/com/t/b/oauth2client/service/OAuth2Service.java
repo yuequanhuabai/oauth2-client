@@ -25,7 +25,6 @@ public class OAuth2Service {
 
     private final WebClient webClient = WebClient.create();
 
-
     public Map<String, Object> getAccessToken(String code, String codeVerifier) {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");

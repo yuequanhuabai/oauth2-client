@@ -44,7 +44,6 @@ public class OAuth2Service {
         if (response.containsKey("error")) {
             throw new RuntimeException("获取访问令牌失败: " + response.get("error"));
         }
-
         return (String) response.get("access_token");
     }
 
